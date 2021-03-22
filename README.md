@@ -7,12 +7,12 @@ For changing generated test data quantity change MimoDbContextHelper file.
 
 To alternate base test data, please use this
 
-``
+```
         private static List<Achievement> AchievementList;
         private static List<string> CourseName;
         private static List<string> ChapterName;  
         private static List<string> UserGuid
 		
-``
+```
 
 To change the amount of Users results, please look to comments in code
