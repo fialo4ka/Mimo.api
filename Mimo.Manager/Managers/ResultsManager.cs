@@ -151,19 +151,19 @@ namespace Mimo.Managers.Managers
                 .GroupBy(x => x.LessonId).Select(x => x.First()).ToList();
         }
 
-        public List<Chapter> GetFinishedChapters(List<UserLesson> lessons)
+        public List<Chapter> GetFinishedChapters(List<UserLesson> finishedLessons)
         {
             var finishedChapters = new List<Chapter>();
-            if (lessons == null || lessons?.Count == 0)
+            if (finishedLessons == null || finishedLessons?.Count == 0)
             {
 
                 return finishedChapters;
             }
-            var startChaptersIds = lessons.GroupBy(x => x.Lesson.ChapterId).Select(x => x.First()).Select(x => x.Lesson.ChapterId).ToList();
+            var startChaptersIds = finishedLessons.GroupBy(x => x.Lesson.ChapterId).Select(x => x.First())?.Select(x => x.Lesson?.ChapterId).ToList();
             var startChapters = _coursesService.GetChapters().Where(x => startChaptersIds.Contains(x.Id)).ToList();
             foreach (var chapter in startChapters)
             {
-                var lessonsForChapter = lessons.Where(x => x.Lesson.ChapterId == chapter.Id).ToList();
+                var lessonsForChapter = finishedLessons.Where(x => x.Lesson.ChapterId == chapter.Id).ToList();
                 if (lessonsForChapter.Count() == chapter.Lessons?.Count)
                 {
                     finishedChapters.Add(chapter);
@@ -172,14 +172,14 @@ namespace Mimo.Managers.Managers
             return finishedChapters;
         }
 
-        public List<Course> GetFinishedCourses(List<UserLesson> lessons, List<Chapter> finishedChapters)
+        public List<Course> GetFinishedCourses(List<UserLesson> finishedLessons, List<Chapter> finishedChapters)
         {
             var finishedCourses = new List<Course>();
-            if (lessons == null || lessons?.Count == 0 || finishedChapters == null || finishedChapters?.Count == 0)
+            if (finishedLessons == null || finishedLessons?.Count == 0 || finishedChapters == null || finishedChapters?.Count == 0)
             {
                 return finishedCourses;
             }
-            var startCoursesIds = lessons.GroupBy(x => x.Lesson.ChapterId).Select(x => x.First()).Select(x => x.Lesson.Chapter).GroupBy(x => x.CourseId).Select(x => x.First()).Select(x => x.CourseId).ToList();
+            var startCoursesIds = finishedLessons.GroupBy(x => x.Lesson.ChapterId).Select(x => x.First()).Select(x => x.Lesson.Chapter).GroupBy(x => x.CourseId).Select(x => x.First()).Select(x => x.CourseId).ToList();
             var startCourses = _coursesService.GetCorses().Where(x => startCoursesIds.Contains(x.Id)).ToList();
             foreach (var course in startCourses)
             {
