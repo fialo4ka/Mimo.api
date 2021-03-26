@@ -134,10 +134,41 @@ namespace Mimo.Managers.Managers.Tests
             Assert.True(result.Count == resultCount);
         }
 
-        [Fact()]
-        public void GetFinishedCoursesTest()
+        public static readonly object[][] GetUserLessonForCoursesData = {
+            new object[] { 0, null, null, null},
+            new object[] { 0, new List<Course> { }, null, null},
+            new object[] { 0, new List<Course> { }, new List<Chapter>{ }, null},
+            new object[] { 0, new List<Course> { }, new List<Chapter>{ }, new List<UserLesson> { }},
+
+            new object[] { 1, new List<Course> { new Course { Id = 1, Chapters = new List<Chapter> { new Chapter { Id = 1}, new Chapter { Id = 2} } },//need to be in result
+                                                new Course { Id = 2, Chapters = new List<Chapter> { new Chapter { Id = 3}, new Chapter { Id = 4} }}},
+                            new List<Chapter> { new Chapter { Id = 1, CourseId = 1, Lessons = new List<Lesson> { new Lesson { Id = 1 }, new Lesson { Id = 2 } }} ,
+                                                new Chapter { Id = 2, CourseId = 1, Lessons = new List<Lesson>{ new Lesson { Id = 3}, new Lesson { Id = 4}, new Lesson { Id = 5}}}},
+                            new List<UserLesson> { new UserLesson { UserId = 1, LessonId = 1, IsCompleted = true, EndDate = DateTime.Now, Lesson = new Lesson{ ChapterId = 1, Chapter = new Chapter{ Id = 1, CourseId = 1 } } },//need to be in result
+                                                    new UserLesson { UserId = 1, LessonId = 2, IsCompleted = true, EndDate = DateTime.Now, Lesson = new Lesson{ ChapterId = 1, Chapter = new Chapter{ Id = 1, CourseId = 1 } }},//need to be in result
+                                                    new UserLesson { UserId = 1, LessonId = 3, IsCompleted = true, EndDate = DateTime.Now, Lesson = new Lesson{ ChapterId = 2, Chapter = new Chapter{Id = 2, CourseId = 1 } }},//need to be in result
+                                                    new UserLesson { UserId = 1, LessonId = 4, IsCompleted = true, EndDate = DateTime.Now, Lesson = new Lesson{ ChapterId = 2, Chapter = new Chapter{Id = 2, CourseId = 1 } }},//need to be in result
+                                                    new UserLesson { UserId = 1, LessonId = 5, IsCompleted = true, EndDate = DateTime.Now, Lesson = new Lesson{ ChapterId = 2, Chapter = new Chapter{Id = 2, CourseId = 1 } }},//need to be in result
+                                                    new UserLesson { UserId = 1, LessonId = 6, IsCompleted = true, EndDate = DateTime.Now, Lesson = new Lesson{ ChapterId = 3, Chapter = new Chapter{Id = 3, CourseId = 2,} }}
+            }
+
+            },
+        };
+        [Theory, MemberData(nameof(GetUserLessonForCoursesData))]
+
+        public void GetFinishedCoursesTest_Passt(int resultCount, List<Course> allCourses, List<Chapter> finishedChapters, List<UserLesson> finishedLessons)
         {
-            Assert.True(false, "This test needs an implementation");
+            if (allCourses == null)
+            {
+                _coursesService.Setup(x => x.GetCorses()).Returns((IQueryable<Course>)null);
+            }
+            else
+            {
+                _coursesService.Setup(x => x.GetCorses()).Returns(allCourses.AsQueryable());
+            }
+            var result = _resultsManager.GetFinishedCourses(finishedLessons, finishedChapters);
+            Assert.True(result != null);
+            Assert.True(result.Count == resultCount);
         }
     }
 }
